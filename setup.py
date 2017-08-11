@@ -3,7 +3,7 @@
 from setuptools import find_packages, setup
 
 
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 REPO_URL = 'https://github.com/drongo-framework/drongo-wing-static'
 DOWNLOAD_URL = REPO_URL + '/archive/v{version}.tar.gz'.format(version=VERSION)
 
@@ -24,6 +24,9 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
+    ],
+    install_requires=[
+        'drongo-wing-module==1.0.0',
     ],
     packages=find_packages(),
     url=REPO_URL,

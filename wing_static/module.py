@@ -3,21 +3,27 @@ from drongo import HttpResponseHeaders
 from functools import partial
 from datetime import datetime, timedelta
 
+from wing_module import Module
+
+import logging
 import mimetypes
 import os
 
 
-class Static(object):
-    def __init__(self, app, **config):
-        self.app = app
+class Static(Module):
+    logger = logging.getLogger('wing_static')
+
+    def init(self, config):
+        self.logger.info('Initializing [static] module.')
+
         self.root_dir = config.get('root_dir')
         self.base_url = config.get('base_url', '/static')
         self.age = config.get('age', 300)
         self.max_depth = config.get('max_depth', 6)
 
-        self.init()
+        self.init_urls()
 
-    def init(self):
+    def init_urls(self):
         parts = ['', '{a}', '{b}', '{c}', '{d}', '{e}', '{f}']
         for i in range(2, self.max_depth + 2):
             self.app.add_url(
@@ -50,5 +56,7 @@ class Static(object):
             ctx.response.set_header(HttpResponseHeaders.CONTENT_TYPE, ctype)
             ctx.response.set_content(self.chunks(path), os.stat(path).st_size)
             return
+        else:
+            self.logger.warn('Static file not found!')
 
         return path
