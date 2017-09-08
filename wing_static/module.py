@@ -1,4 +1,5 @@
 from drongo import HttpResponseHeaders
+from drongo import exceptions
 
 from functools import partial
 from datetime import datetime, timedelta
@@ -10,7 +11,12 @@ import mimetypes
 import os
 
 
+__all__ = ['Static']
+
+
 class Static(Module):
+    """Drongo module that serves static files"""
+
     logger = logging.getLogger('wing_static')
 
     def init(self, config):
@@ -59,4 +65,4 @@ class Static(Module):
         else:
             self.logger.warn('Static file not found!')
 
-        return path
+        raise exceptions.NotFoundException()
