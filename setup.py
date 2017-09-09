@@ -30,7 +30,6 @@ setup(
     ],
     packages=find_packages(),
     url=REPO_URL,
-    download_url=DOWNLOAD_URL,
     include_package_data=True,
     zip_safe=False,
 )
