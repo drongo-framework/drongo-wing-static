@@ -22,6 +22,8 @@ class Static(Module):
     def init(self, config):
         self.logger.info('Initializing [static] module.')
 
+        self.app.context.modules.static = self
+
         self.root_dir = config.get('root_dir')
         self.base_url = config.get('base_url', '/static')
         self.age = config.get('age', 300)
@@ -63,6 +65,7 @@ class Static(Module):
             ctx.response.set_content(self.chunks(path), os.stat(path).st_size)
             return
         else:
-            self.logger.warn('Static file not found!')
+            self.logger.warn('Static file [{path}] not found!'.format(
+                path=path))
 
         raise exceptions.NotFoundException()
