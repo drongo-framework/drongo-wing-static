@@ -17,25 +17,25 @@ __all__ = ['Static']
 class Static(Module):
     """Drongo module that serves static files"""
 
+    __default_config__ = {
+        'base_url': '/static',
+        'age': 300,
+        'max_depth': 6
+    }
+
     logger = logging.getLogger('wing_static')
 
     def init(self, config):
         self.logger.info('Initializing [static] module.')
-
         self.app.context.modules.static = self
-
-        self.root_dir = config.get('root_dir')
-        self.base_url = config.get('base_url', '/static')
-        self.age = config.get('age', 300)
-        self.max_depth = config.get('max_depth', 6)
 
         self.init_urls()
 
     def init_urls(self):
         parts = ['', '{a}', '{b}', '{c}', '{d}', '{e}', '{f}']
-        for i in range(2, self.max_depth + 2):
+        for i in range(2, self.config.max_depth + 2):
             self.app.add_url(
-                pattern=self.base_url + '/'.join(parts[:i]),
+                pattern=self.config.base_url + '/'.join(parts[:i]),
                 call=self.serve_file)
 
     def chunks(self, path):
@@ -45,7 +45,7 @@ class Static(Module):
 
     def serve_file(self, ctx,
                    a=None, b=None, c=None, d=None, e=None, f=None):
-        path = self.root_dir
+        path = self.config.root_dir
         parts = [a, b, c, d, e, f]
         for part in parts:
             if part is not None:
@@ -53,9 +53,9 @@ class Static(Module):
 
         if os.path.exists(path) and not os.path.isdir(path):
             ctx.response.set_header(HttpResponseHeaders.CACHE_CONTROL,
-                                    'max-age=%d' % self.age)
+                                    'max-age=%d' % self.config.age)
 
-            expires = datetime.utcnow() + timedelta(seconds=(self.age))
+            expires = datetime.utcnow() + timedelta(seconds=(self.config.age))
             expires = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
             ctx.response.set_header(HttpResponseHeaders.EXPIRES, expires)
 
@@ -63,9 +63,9 @@ class Static(Module):
 
             ctx.response.set_header(HttpResponseHeaders.CONTENT_TYPE, ctype)
             ctx.response.set_content(self.chunks(path), os.stat(path).st_size)
-            return
+
         else:
             self.logger.warn('Static file [{path}] not found!'.format(
                 path=path))
 
-        raise exceptions.NotFoundException()
+            raise exceptions.NotFoundException()
